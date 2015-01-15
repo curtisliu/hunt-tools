@@ -10,7 +10,7 @@ client_id = <client_id>
 client_secret = <client_secret>
 ```
 
-You should also enable the Google Drive and URL Shortener APIs.
+You should also enable the Google Drive ([guide](https://developers.google.com/drive/web/enable-sdk#enable_the_drive_api)) and URL Shortener APIs ([guide](https://developers.google.com/url-shortener/v1/getting_started#auth)).
 
 Then you can run `./gdrive_api.py` to grab and save the token you'll use for all your api requests. It will save your credentials to a file called `gdrive_creds` in your home directory.
 
