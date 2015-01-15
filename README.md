@@ -1,4 +1,4 @@
-To get this working, you first need the appropriate Python libraries (should be all the ones in requirements.txt)
+To get this working, you first need the appropriate Python libraries (can run `sudo pip install -r requirements.txt`, sudo not needed if installing to a virtualenv)
 
 Then you also need to generate a google token. You can follow the guide [here](https://developers.google.com/drive/web/quickstart/quickstart-python#step_1_enable_the_drive_api).
 
