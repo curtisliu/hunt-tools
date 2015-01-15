@@ -4,11 +4,11 @@ Then you also need to generate a google token. You can follow the guide [here](h
 
 Basically, you need to create a project, then generate client id and client secret, and put those in your homedir (whatever comes back when you run `python -c 'import os; print os.path.expanduser("~")'`) in a file called `hunttools.conf` (you can copy and modify the one in the repo):
 
-    ```
-    [gdrive]
-    client_id = <client_id>
-    client_secret = <client_secret>
-    ```
+```
+[gdrive]
+client_id = <client_id>
+client_secret = <client_secret>
+```
 
 You should also enable the Google Drive and URL Shortener APIs.
 
@@ -16,10 +16,10 @@ Then you can run `./gdrive_api.py` to grab and save the token you'll use for all
 
 You also need to grab the slack token, probably from [here](https://api.slack.com/web#auth). And add that to `hunttools.conf` like this:
     
-    ```
-    [slack]
-    token = <token>
-    ```
+```
+[slack]
+token = <token>
+```
 
 Then you should be able to call
 ```
