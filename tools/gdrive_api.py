@@ -1,6 +1,10 @@
+#!/usr/bin/env python
 from __future__ import absolute_import, unicode_literals
 
+import codecs
+import sys
 import os
+import ConfigParser
 
 import httplib2
 from apiclient.discovery import build
@@ -8,9 +12,7 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.file import Storage
 
 HOMEDIR = os.path.expanduser('~')
-
-CLIENT_ID_FILE = os.path.join(HOMEDIR, 'gdrive_client_id')
-CLIENT_SECRET_FILE = os.path.join(HOMEDIR, 'gdrive_client_secret')
+CONFIG_FILE = os.path.join(HOMEDIR, 'hunttools.conf')
 
 # Copy your credentials from the console
 CLIENT_ID = None
@@ -23,13 +25,14 @@ def ensure_secrets():
     if SECRETS_INITIALIZED:
         return
 
-    with codecs.open(CLIENT_ID_FILE, 'r', 'utf8') as f:
-        global CLIENT_ID
-        CLIENT_ID = f.read().strip()
+    parser = ConfigParser.ConfigParser()
+    parser.read(CONFIG_FILE)
 
-    with codecs.open(CLIENT_SECRET_FILE, 'r', 'utf8') as f:
-        global CLIENT_SECRET
-        CLIENT_SECRET = f.read().strip()
+    global CLIENT_ID
+    CLIENT_ID = parser.get('gdrive', 'client_id')
+
+    global CLIENT_SECRET
+    CLIENT_SECRET = parser.get('gdrive', 'client_secret')
 
     SECRETS_INITIALIZED = True
 
@@ -40,13 +43,18 @@ def get_credentials():
     creds = storage.get()
     if creds:
         return creds
+    generate_credentials()
 
+def generate_credentials():
+    credentials_file = os.path.join(HOMEDIR, 'gdrive_creds')
+    storage = Storage(credentials_file)
     # first, make sure we grabbed the credentials
     ensure_secrets()
 
     OAUTH_SCOPE = ' '.join((
         'https://www.googleapis.com/auth/drive',
         'https://spreadsheets.google.com/feeds',
+        'https://www.googleapis.com/auth/urlshortener'
     ))
 
     # Redirect URI for installed apps
@@ -71,3 +79,11 @@ def get_service():
     http = credentials.authorize(http)
 
     return build('drive', 'v2', http=http)
+
+def main():
+    generate_credentials()
+    return 0
+
+if __name__ == '__main__':
+    status = main()
+    sys.exit(status)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, unicode_literals
+import ConfigParser
 
 import argparse
 import os
@@ -14,6 +15,7 @@ from apiclient.discovery import build
 from oauth2client.file import Storage
 
 HOMEDIR = os.path.expanduser('~')
+CONFIG_FILE = os.path.join(HOMEDIR, 'hunttools.conf')
 
 def get_credentials():
     credentials_file = os.path.join(HOMEDIR, 'gdrive_creds')
@@ -138,8 +140,9 @@ class Sheet(object):
 
 
 def get_slack_token():
-    with open(os.path.join(HOMEDIR, 'slack_token')) as f:
-        return f.read().strip()
+    parser = ConfigParser.ConfigParser()
+    parser.read(CONFIG_FILE)
+    return parser.get('slack', 'token')
 
 def create_channel(name):
     body_dict = {
