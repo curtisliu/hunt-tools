@@ -2,16 +2,15 @@
 from __future__ import absolute_import, unicode_literals
 
 import argparse
-import codecs
 import os
 import pprint
 import sys
 import urllib
+import xml.etree.ElementTree as etree
 
 import httplib2
 import simplejson as json
 from apiclient.discovery import build
-from lxml import etree
 from oauth2client.file import Storage
 
 HOMEDIR = os.path.expanduser('~')
@@ -80,25 +79,8 @@ def get_cell_feed_url_from_sheet_entry_xml(entry_xml):
         if not e.attrib['rel'].endswith('cellsfeed'):
             continue
         links.append(e)
-    assert len(links) == 1, etree.fromstring(entry_xml, pretty_print=True)
+    assert len(links) == 1, etree.fromstring(entry_xml)
     return links[0].attrib['href']
-
-# def set_cell(sheet_id, row, col, value, original_value=None):
-#     h = get_authed_http()
-#     worksheet_feed_url = get_worksheet_feed_url(sheet_id)
-#     response_headers, response = h.request(worksheet_feed_url)
-#     xml_tree = etree.fromstring(response)
-
-#     # first get sheet 1
-#     entries = [e for e in xml_tree if e.tag.endswith('entry')]
-#     assert len(entries) == 1
-#     sheet1 = entries[0]
-
-#     cell_feed_url = get_cell_feed_url_from_sheet_entry_xml(sheet1)
-
-#     response_headers, response = h.request(cell_feed_url)
-#     xml_tree = etree.fromstring(response)
-#     entries = [e for e in xml_tree if e.tag.endswith('entry')]
 
 
 def get_cell_entry_url(sheet_id, row, col):
@@ -112,11 +94,10 @@ def set_cell(sheet_id, row, col, value):
     cell_entry = etree.fromstring(response)
     edit_url = cell_entry[-2].attrib['href']
 
-    nsmap = {
-        None: "http://www.w3.org/2005/Atom",
-        'gs': "http://schemas.google.com/spreadsheets/2006"
-    }
-    put_entry = etree.Element('entry', nsmap=nsmap)
+    etree.register_namespace('', "http://www.w3.org/2005/Atom")
+    etree.register_namespace('gs', "http://schemas.google.com/spreadsheets/2006")
+
+    put_entry = etree.Element('entry')
     put_entry.append(cell_entry[0]) # id element
     put_entry.append(cell_entry[-2]) # edit url
 
@@ -125,9 +106,10 @@ def set_cell(sheet_id, row, col, value):
     actual_cell.attrib['inputValue'] = value
     put_entry.append(actual_cell) # put element
     headers = {'content-type': 'application/atom+xml'}
+    body = etree.tostring(put_entry)
     response_headers, response = http.request(
         edit_url, 'PUT',
-        body=etree.tostring(put_entry),
+        body=body,
         headers=headers)
 
 
@@ -141,8 +123,6 @@ class Sheet(object):
         # make a copy of the template and name it puzzle_name
         print("making a copy...")
         self.obj = copy_sheet(template_sheet, title=puzzle_name)
-
-        # pprint.pprint(self.obj)
 
     @property
     def link(self):
