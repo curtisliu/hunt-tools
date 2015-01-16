@@ -1,6 +1,6 @@
 To get this working, you first need the appropriate Python libraries (can run `sudo pip install -r requirements.txt`, sudo not needed if installing to a virtualenv)
 
-Then you also need to generate a google token. You can follow the guide [here](https://developers.google.com/drive/web/quickstart/quickstart-python#step_1_enable_the_drive_api).
+Then you also need to generate a google token. You can follow the guide [here](https://developers.google.com/drive/web/quickstart/quickstart-python#step_1_enable_the_drive_api). Use a native application.
 
 Basically, you need to create a project, then generate client id and client secret, and put those in your homedir (whatever comes back when you run `python -c 'import os; print os.path.expanduser("~")'`) in a file called `hunttools.conf` (you can copy and modify the one in the repo):
 
